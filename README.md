@@ -1,43 +1,40 @@
-# 📰 FakeScan — AI-Powered Fake News Detection System
+# 📰 FaN-De : Fake News Detector
 
-FakeScan is a full-stack machine learning web application that analyzes news content and predicts whether it is **likely real or fake** based on textual patterns.
+FaN-De (Fake News Detector) is a premium, full-stack machine learning web application that evaluates the credibility of news articles. 
 
-It combines **Natural Language Processing (NLP)**, **Machine Learning**, and a **modern frontend UI** to provide an interactive fake news detection experience.
+Unlike simple keyword matching or frequency-based models, FaN-De uses **deep semantic embeddings (Sentence-BERT)** to understand news content, extracts key statements, and validates them in real-time using a **Retrieval-Augmented Generation (RAG) pipeline** against both a database of trusted facts and live Google News articles.
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-* 🧠 ML-based Fake News Detection (Logistic Regression + TF-IDF)
-* ✍️ Analyze **text input**
-* 🔗 Analyze **news article URLs**
-* 📊 Confidence score with visual indicator
-* 🧾 Scan history tracking (frontend)
-* ⚡ Fast and responsive UI (cyberpunk-inspired design)
-* 🌐 REST API using Flask
+* **🧠 Semantic Modeling**: Uses `all-mpnet-base-v2` SentenceTransformer embeddings to capture context, rather than simple keyword frequencies.
+* **🛡️ SVC Classification**: Classified via a Support Vector Machine (SVC) trained on textual patterns.
+* **🔍 Claim-by-Claim Check**: Automatically separates the text into core factual assertions.
+* **📡 Live RAG Verification**: Searches live news reports (via GNews) to gather supporting or contradicting evidence for each claim.
+* **📁 Database Manager**: Includes an interactive panel to review baseline facts and dynamically add new verified statements (which are immediately embedded in vector space and saved to disk).
+* **📰 News Explorer**: Browse active stories on Google News and verify them with a single click.
+* **📜 Verification Logs**: Saves history locally so you can recall past checks instantly.
+* **🎨 Human-Designed UI**: Responsive dark/light theme designed with a clean slate SaaS look.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### 🔹 Machine Learning
-
-* Python
-* Scikit-learn
-* TF-IDF Vectorization
-* Logistic Regression
+### 🔹 Machine Learning & NLP
+* **Sentence-Transformers**: `all-mpnet-base-v2` (for semantic text vectorization)
+* **Scikit-learn**: Support Vector Classifier (RBF kernel, probability estimation)
+* **Pandas & NumPy**: Feature mapping and dataset operations
 
 ### 🔹 Backend
-
-* Flask
-* Flask-CORS
-* BeautifulSoup (for web scraping)
-* NLTK (text preprocessing)
+* **FastAPI**: Modern, async ASGI framework serving endpoints
+* **Uvicorn**: High-performance web server
+* **GNews**: Google News client API
+* **BeautifulSoup**: Article scrubbing and HTML cleaning
 
 ### 🔹 Frontend
-
-* HTML, CSS, JavaScript
-* Custom UI (no frameworks)
+* **HTML5, CSS3, ES6 JavaScript**: Sleek Single Page Application served statically from the backend
+* **SVG Gauge Rendering**: Custom animated gauge charts
 
 ---
 
@@ -46,171 +43,114 @@ It combines **Natural Language Processing (NLP)**, **Machine Learning**, and a *
 ```
 Fake_News_Detector/
 │
-├── Dataset/                  # (ignored in Git)
-│   └── WELFake_Dataset.csv
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── config.py         # Paths, model names, and default parameters
+│   │   ├── main.py           # FastAPI routes and static files mounting
+│   │   ├── predictor.py      # Claims isolation, similarity checking, and inference
+│   │   └── train.py          # Standalone training CLI
+│   │
+│   ├── static/               # Frontend Client SPA
+│   │   ├── index.html        # App layout and modals
+│   │   ├── style.css         # Minimalist slate design styles
+│   │   └── app.js            # API fetch calls, storage logging, and rendering
+│   │
+│   └── requirements.txt      # Python dependencies
 │
-├── model/
-│   ├── model.pkl
-│   └── tfidf.pkl
-│
-├── app.py                   # Flask backend
-├── index.html               # Frontend UI
-├── train.py (optional)      # Model training script
-├── requirements.txt
+├── fake_or_real_news.csv     # Model training dataset
+├── model.pkl                 # Pre-trained SVC classifier model
+├── label_encoder.pkl         # Target classes label encoder
+├── fact_embeddings.pkl       # Vectorized baseline fact embeddings
+├── trusted_facts.pkl         # Baseline text facts list
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 📊 Dataset
+## ⚙️ Installation & Local Setup
 
-Dataset used: **WELFake Dataset**
-
-🔗 https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification
-
-> ⚠️ Note: Dataset is not included in this repository due to size limitations.
-
-### 📥 How to Use:
-
-1. Download dataset from Kaggle
-2. Place it in:
-
-```
-Dataset/WELFake_Dataset.csv
+### 1️⃣ Install Dependencies
+Ensure you have **Python 3.10+** installed. Install the backend requirements:
+```bash
+pip install -r backend/requirements.txt
 ```
 
----
+### 2️⃣ Initialize Pre-trained Models
+Ensure the following files are present in the workspace root directory:
+* `model.pkl`
+* `label_encoder.pkl`
+* `fact_embeddings.pkl`
+* `trusted_facts.pkl`
 
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the repository
-
+*(If you ever need to train or retrain the classifier on the CSV dataset, run the training script:)*
+```bash
+# Trains model (runs on a 1000-sample subset by default to save time on CPU)
+python -m backend.app.train --samples 1000
 ```
-git clone https://github.com/mangalrohan05/Fake_News_Detector.git
-cd Fake_News_Detector
+
+### 3️⃣ Launch the Server
+Start the FastAPI server:
+```bash
+python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
----
-
-### 2️⃣ Install dependencies
-
+### 4️⃣ Open Dashboard
+Open your web browser and navigate to:
 ```
-pip install -r requirements.txt
+http://127.0.0.1:8000/
 ```
 
 ---
 
-### 3️⃣ Download NLTK resources
+## 🧪 API Endpoints
 
-```
-python -m nltk.downloader stopwords
-python -m nltk.downloader wordnet
-```
+### `GET /api/status`
+Returns model loading details, facts count, and config parameters.
 
----
+### `POST /api/analyze`
+Submits text for credibility checking.
+* **Payload**:
+  ```json
+  {
+    "text": "The article content...",
+    "use_live_rag": true,
+    "n_claims": 5
+  }
+  ```
+* **Response**:
+  ```json
+  {
+    "verdict": "REAL",
+    "credibility_score": 87,
+    "probabilities": { "FAKE": 0.13, "REAL": 0.87 },
+    "claims": ["Statement 1", "Statement 2"],
+    "evidence": [
+      {
+        "title": "Evidence Article Title",
+        "publisher": "BBC News",
+        "desc": "Summary details...",
+        "url": "https://bbc.com/news/...",
+        "similarity": 0.72,
+        "verdict": "Supports"
+      }
+    ],
+    "rag_mode": "live"
+  }
+  ```
 
-### 4️⃣ Train the model (if not using pre-trained)
+### `GET /api/trusted-facts`
+Returns the current database fact list.
 
-```
-python train.py
-```
-
----
-
-### 5️⃣ Run backend
-
-```
-python app.py
-```
-
-Server will start at:
-
-```
-http://127.0.0.1:5000
-```
-
----
-
-### 6️⃣ Run frontend
-
-Simply open:
-
-```
-index.html
-```
-
----
-
-## 🧪 API Usage
-
-### Endpoint:
-
-```
-POST /predict
-```
-
-### Request Format:
-
-```json
-{
-  "type": "text",
-  "data": "News content here"
-}
-```
-
-OR
-
-```json
-{
-  "type": "url",
-  "data": "https://example.com/news"
-}
-```
-
-### Response:
-
-```json
-{
-  "prediction": "FAKE",
-  "confidence": 0.87
-}
-```
-
----
-
-## ⚠️ Important Notes
-
-* This model detects **patterns**, not factual truth.
-* Accuracy depends on dataset quality and input type.
-* URL-based predictions may include noise (ads, metadata, etc.).
-
----
-
-## 🔮 Future Improvements
-
-* 📈 Better dataset (real-world news sources)
-* 🧠 Deep Learning models (LSTM, BERT)
-* 🖼️ Image & PDF input support (OCR)
-* 🌍 Live deployment (Render / Vercel)
-* 🧩 Chrome Extension for real-time detection
+### `POST /api/trusted-facts`
+Dynamically adds a fact, embeds it, and saves it.
+* **Payload**: `{"fact": "Factual statement here..."}`
 
 ---
 
 ## 👨‍💻 Author
 
 **Rohan Mangal**
-2nd Year BE Student
 MBM University, Jodhpur
-
----
-
-## ⭐ Contribute
-
-Feel free to fork this repo and improve it!
-
----
-
-## 📜 License
-
-This project is for educational and research purposes.
+*(Educational Research Project)*
