@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaN-De : Fake News Detector</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="3" width="20" height="18" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M6 7h12M6 11h12M6 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M16 19l2.5 2.5 4-4" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <h1>FaN-De</h1>
+                    <p>Fake News Detector</p>
+                </div>
+            </div>
+
+            <div class="header-controls">
+                <div id="connection-pill" class="status-pill status-connecting">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Connecting</span>
+                </div>
+                <button id="theme-toggle" class="control-btn" aria-label="Toggle light/dark theme">
+                    <!-- Moon icon for dark theme (shows when in light theme) -->
+                    <svg class="icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <!-- Sun icon for light theme (shows when in dark theme) -->
+                    <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main-layout">
+        <!-- Navigation Tab bar -->
+        <nav class="tab-navigation">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="tab-analyzer">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    News Analyzer
+                </button>
+                <button class="tab-btn" data-tab="tab-database">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Reference Database
+                </button>
+                <button class="tab-btn" data-tab="tab-news-browser">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><path d="M16 9h2m-2 3h2m-10-3h4m-4 3h4m-4 3h8"></path></svg>
+                    News Explorer
+                </button>
+                <button class="tab-btn" data-tab="tab-history">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Past Verifications
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Sections -->
+        <div class="content-viewport">
+            
+            <!-- Section 1: News Analyzer -->
+            <section id="tab-analyzer" class="tab-content active">
+                <div class="analyzer-grid">
+                    <!-- Left: Input Column -->
+                    <div class="glass-card input-card">
+                        <div class="card-header">
+                            <h2>Analyze an Article</h2>
+                            <p>Paste the content of a news article or select a sample story below to check its accuracy.</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="input-header">
+                                <label for="news-input">News Text</label>
+                                <select id="sample-selector" class="sample-select">
+                                    <option value="" disabled selected>-- Select a test sample --</option>
+                                    <option value="real-1">Real: Certification of 2020 Election</option>
+                                    <option value="real-2">Real: NASA Artemis Lunar Flight</option>
+                                    <option value="fake-1">Fake: Autism Vaccine Conspiracy</option>
+                                    <option value="fake-2">Fake: Hidden Asteroid Collision</option>
+                                </select>
+                            </div>
+                            <textarea id="news-input" placeholder="Paste the news story here (minimum 50 characters)..." maxlength="10000"></textarea>
+                            <div class="char-count"><span id="input-chars">0</span> / 10000 characters</div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="setting-item">
+                                <span class="setting-title">Verification Mode</span>
+                                <div class="toggle-switch-container">
+                                    <label class="switch">
+                                        <input type="checkbox" id="toggle-live-rag" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="switch-label">Search active news reports</span>
+                                </div>
+                                <p class="setting-desc">Searches live news reports to find corroborating or contradicting information.</p>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="slider-header">
+                                    <span class="setting-title">Statements to Extract</span>
+                                    <span id="claims-val" class="badge">5</span>
+                                </div>
+                                <input type="range" id="claims-range" min="2" max="8" value="5" class="range-slider">
+                                <p class="setting-desc">The number of core factual claims to separate from the text and check.</p>
+                            </div>
+                        </div>
+
+                        <button id="btn-analyze" class="action-btn-primary">
+                            <span>Check Credibility</span>
+                            <svg class="btn-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"></circle></svg>
+                        </button>
+                    </div>
+
+                    <!-- Right: Results Column (Hidden initially, shown after submit) -->
+                    <div id="results-placeholder" class="glass-card placeholder-card">
+                        <div class="placeholder-content">
+                            <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="11" y2="17"></line></svg>
+                            <h3>Awaiting Analysis</h3>
+                            <p>Enter some news content on the left to verify its claims against trusted records and live reporting.</p>
+                        </div>
+                    </div>
+
+                    <div id="results-panel" class="results-layout" style="display: none;">
+                        <!-- Credibility Score Dashboard -->
+                        <div class="glass-card result-dashboard">
+                            <div class="dashboard-grid">
+                                <!-- Circular Gauge -->
+                                <div class="gauge-column">
+                                    <div class="gauge-container">
+                                        <svg class="gauge-svg" viewBox="0 0 120 120">
+                                            <!-- Background track -->
+                                            <circle class="gauge-track" cx="60" cy="60" r="50" fill="none" stroke-width="8"></circle>
+                                            <!-- Dynamic filled arc -->
+                                            <circle id="gauge-fill" class="gauge-fill" cx="60" cy="60" r="50" fill="none" stroke-width="8" stroke-dasharray="314.15" stroke-dashoffset="314.15" transform="rotate(-90 60 60)"></circle>
+                                        </svg>
+                                        <div class="gauge-text">
+                                            <span id="score-text">0%</span>
+                                            <span class="label">VERDICT SCORE</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Verdict text details -->
+                                <div class="verdict-column">
+                                    <div class="verdict-badge-container">
+                                        <span id="verdict-badge" class="verdict-badge badge-real">LIKELY REAL</span>
+                                    </div>
+                                    <h3 id="verdict-title">Verification Summary</h3>
+                                    <p id="verdict-summary">Our model has cross-checked the article's claims against recent news and our database. Here is what we found.</p>
+                                    
+                                    <div class="probability-bars">
+                                        <div class="prob-bar-container">
+                                            <div class="bar-label">
+                                                <span>Likely Reliable</span>
+                                                <span id="prob-real-val">0%</span>
+                                            </div>
+                                            <div class="bar-track">
+                                                <div id="prob-real-fill" class="bar-fill bg-real" style="width: 0%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="prob-bar-container">
+                                            <div class="bar-label">
+                                                <span>Likely Misleading</span>
+                                                <span id="prob-fake-val">0%</span>
+                                            </div>
+                                            <div class="bar-track">
+                                                <div id="prob-fake-fill" class="bar-fill bg-fake" style="width: 0%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Claims and Evidence Breakdown -->
+                        <div class="glass-card detail-card">
+                            <div class="card-header">
+                                <h3>Claim-by-Claim Check</h3>
+                                <p>We broke down the article into key statements and matched them against recent reports and trusted facts.</p>
+                            </div>
+                            
+                            <!-- Extracted Claims -->
+                            <div class="claims-list-wrapper">
+                                <h4>Claims Extracted:</h4>
+                                <ul id="claims-list" class="claims-list">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+
+                            <!-- Retrieved Evidence -->
+                            <div class="evidence-wrapper">
+                                <h4>Related Sources Found:</h4>
+                                <div id="evidence-list" class="evidence-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Trusted Database -->
+            <section id="tab-database" class="tab-content">
+                <div class="database-layout">
+                    <!-- Left: Add Fact Form -->
+                    <div class="glass-card db-add-card">
+                        <div class="card-header">
+                            <h2>Add to Database</h2>
+                            <p>Add a known fact to our baseline knowledge database. It will be saved and immediately used to check future articles.</p>
+                        </div>
+                        <form id="add-fact-form">
+                            <div class="input-group">
+                                <label for="fact-text-input">Factual Statement</label>
+                                <textarea id="fact-text-input" placeholder="Type a concise, verified statement of fact. E.g., 'The World Health Organization declared the Covid-19 outbreak a global pandemic in March 2020.'" required minlength="10"></textarea>
+                            </div>
+                            <button type="submit" id="btn-add-fact" class="action-btn-primary">Save Fact</button>
+                        </form>
+                        <div id="db-action-status" class="alert-box" style="display: none;"></div>
+                    </div>
+
+                    <!-- Right: Facts list -->
+                    <div class="glass-card db-list-card">
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2>Baseline Reference Facts</h2>
+                                <p>A database of verified facts we use to check claim credibility.</p>
+                            </div>
+                            <span id="db-count-badge" class="badge">0 loaded</span>
+                        </div>
+                        
+                        <div class="search-filter-row">
+                            <input type="text" id="db-search" class="search-input" placeholder="Search database facts...">
+                        </div>
+
+                        <div class="db-facts-container">
+                            <ul id="db-facts-list" class="db-facts-list">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: News Explorer -->
+            <section id="tab-news-browser" class="tab-content">
+                <div class="news-browser-layout">
+                    <div class="glass-card search-card">
+                        <div class="card-header">
+                            <h2>News Explorer</h2>
+                            <p>Browse current stories from Google News and import them into our checker with a single click.</p>
+                        </div>
+                        <div class="search-form-row">
+                            <input type="text" id="gnews-search-input" class="search-input" placeholder="Search topics (e.g. US Election, Artemis program, Vaccine safety)...">
+                            <button id="btn-gnews-search" class="action-btn-primary">Search News</button>
+                        </div>
+                    </div>
+
+                    <div id="gnews-results-placeholder" class="news-results-placeholder">
+                        <p>Search news above to see matches.</p>
+                    </div>
+
+                    <div id="gnews-results" class="news-results-grid" style="display: none;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: History Logs -->
+            <section id="tab-history" class="tab-content">
+                <div class="glass-card history-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Previous Evaluations</h2>
+                            <p>Previous checks performed on this device.</p>
+                        </div>
+                        <button id="btn-clear-history" class="btn-secondary">Clear History</button>
+                    </div>
+                    
+                    <div class="history-table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Verdict</th>
+                                    <th>Score</th>
+                                    <th>Snippet</th>
+                                    <th>Mode</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-rows">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                        <div id="history-empty" class="table-empty">
+                            <p>No previous evaluations found. Run an analysis to store logs.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Modal processing indicators -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loader-box">
+            <div class="simple-spinner"></div>
+            <h3>Checking Credibility</h3>
+            <p id="loader-status">Getting started...</p>
+            
+            <div class="pipeline-progress">
+                <div class="step-item" id="step-preprocess">
+                    <span class="step-marker">1</span>
+                    <span class="step-text">Formatting article text</span>
+                </div>
+                <div class="step-item" id="step-claims">
+                    <span class="step-marker">2</span>
+                    <span class="step-text">Parsing key claims</span>
+                </div>
+                <div class="step-item" id="step-rag">
+                    <span class="step-marker">3</span>
+                    <span class="step-text">Searching for evidence</span>
+                </div>
+                <div class="step-item" id="step-predict">
+                    <span class="step-marker">4</span>
+                    <span class="step-text">Calculating score</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script imports -->
+    <script src="app.js"></script>
+</body>
+</html>
